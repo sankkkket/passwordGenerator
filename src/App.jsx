@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import './App.css'
 
 function App() {
@@ -6,6 +6,8 @@ function App() {
   const [numAllowed, setNumAllowed] = useState(false)
   const [charAllowed, setCharAllowed] = useState(false)
   const [password, setPassword] = useState("")
+
+  const passwordRef = useRef(null)
   
  const passwordGenerator = useCallback (() => {
   let pass = ""
@@ -14,7 +16,7 @@ function App() {
   if (numAllowed) str += "0123456789"
   if (charAllowed) str += "@#$!%^&*(){}`+-/<>_"
 
-  for (let i = 0; i <= length; i++) {
+  for (let i = 0; i < length; i++) {
     let char = Math.floor(Math.random() * str.length + 1)
     pass += str.charAt(char)
   }
@@ -22,6 +24,12 @@ function App() {
   setPassword(pass)
 
  }, [length, numAllowed, charAllowed, setPassword])
+
+ const copyPassToClipboard = useCallback (()=>{
+  passwordRef.current?.select()
+  alert('copied')
+  window.navigator.clipboard.writeText(password)
+ }, [password])
 
  useEffect(()=> {
   passwordGenerator()
@@ -44,15 +52,16 @@ function App() {
             placeholder='password'
             readOnly
             className='text-input'
+            ref={passwordRef}
           />
-          <button className='btn'>copy</button>
+          <button onClick={copyPassToClipboard} className='btn'>copy</button>
         </div>
         <div className='options'>
           <div className='options-name'>
             <input
               type='range'
               min={8}
-              max={25}
+              max={30}
               value={length}
               onChange={(e)=>{setLength(e.target.value)}}
             />
